@@ -13,6 +13,6 @@ app.get('/', function (req, res) {
 })
 
 var port = process.env.PORT || 3000
-app.listen(, function () {
+app.listen(port, function () {
   console.log('Up and running on port: ' + port)
 })
