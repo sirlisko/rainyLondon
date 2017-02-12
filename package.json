@@ -2,7 +2,7 @@
   "name": "rainylondon",
   "version": "0.1.0",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app"
   },
   "author": {
     "name": "Luca Lischetti",
@@ -14,6 +14,8 @@
     "url": "git://github.com/sirLisko/rainyLondon.git"
   },
   "dependencies": {
+    "ejs": "^2.5.5",
+    "express": "~4.14.1",
     "async": "^1.5.0",
     "lodash": "^3.10.1",
     "lowdb": "^0.10.2",
