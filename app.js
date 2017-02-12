@@ -1,5 +1,6 @@
 var express = require('express')
 var path = require('path')
+var weather = require('./modules/current_weather')
 
 var app = express()
 
@@ -9,7 +10,7 @@ app.set('view engine', 'ejs')
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.get('/', function (req, res) {
-  res.render('index', { title: 'Express' })
+  weather('London, UK', (e, weather) => res.render('index', weather))
 })
 
 var port = process.env.PORT || 3000
