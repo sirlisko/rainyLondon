@@ -1,5 +1,3 @@
-### Forecast API
+### Rainy London
 
-##### Loader
-It loads the
-loader(lat, lng, time);
+Is it raining in London?
