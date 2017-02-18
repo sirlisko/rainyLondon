@@ -10,6 +10,7 @@ import rainy_london.worldweatheronline
 
 logger = logging.getLogger(__name__)
 
+
 class CurrentWeather:
     """CurrentWeather class."""
 
@@ -29,7 +30,7 @@ class CurrentWeather:
         if 'services' in params:
             services = params['services'] if params['services'] else None
 
-        if 'lat'  in params and 'long' in params:
+        if 'lat' in params and 'long' in params:
             result = self.get_weather(params['lat'], params['long'], services)
 
         elif 'city' in params and 'state' in params:

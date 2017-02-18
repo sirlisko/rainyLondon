@@ -9,6 +9,7 @@ premium_uri = 'https://api.worldweatheronline.com/premium/v1/weather.ashx'
 
 logger = logging.getLogger(__name__)
 
+
 def get_weather(latitude, longitude):
     """Get the current weather for city_id."""
     query = '{0},{1}'.format(latitude, longitude)

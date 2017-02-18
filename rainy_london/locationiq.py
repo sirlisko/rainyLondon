@@ -9,6 +9,7 @@ uri = 'http://locationiq.org/v1/search.php'
 
 logger = logging.getLogger(__name__)
 
+
 def get_geoloc(city, state):
     """Get latitude and longitude for a city."""
     query = '{0}, {1}'.format(city, state)
