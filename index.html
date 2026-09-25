@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Is It Raining in London?</title>
+  <meta name="description" content="Is it raining in London right now? Probably not. A live answer, plus real rainfall data comparing London with Lake Maggiore and cities around the world.">
+  <link rel="canonical" href="https://rainylondon.sirlisko.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Is it raining in London right now?">
+  <meta property="og:description" content="Probably not. Real rainfall data shows London is drier than its reputation.">
+  <meta property="og:url" content="https://rainylondon.sirlisko.com/">
+  <meta property="og:image" content="https://rainylondon.sirlisko.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Is it raining in London? No. London gets less rain than Lake Maggiore, every single year.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <section class="hero" data-state="loading" aria-busy="true" aria-live="polite">
+    <div class="hero__rain" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <a class="hero__brand" href="/">Rainy London?</a>
+      <div class="toggle toggle--units" role="group" aria-label="Units">
+        <button type="button" data-units="metric" aria-pressed="true">°C, mm</button>
+        <button type="button" data-units="imperial" aria-pressed="false">°F, in</button>
+      </div>
+      <h1 class="hero__question">Is it raining in London right now?</h1>
+      <div class="hero__row">
+        <p class="hero__answer">…</p>
+        <div class="hero__icon"></div>
+      </div>
+      <p class="hero__detail">Checking the sky over Westminster…</p>
+      <p class="hero__quip"></p>
+    </div>
+    <a class="hero__cue" href="#evidence">The evidence <span aria-hidden="true">↓</span></a>
+  </section>
+
+  <main id="evidence">
+    <section class="punchline">
+      <p class="punchline__intro">I grew up on Lake Maggiore, in northern Italy, and lived there until I was 21. So when people say London is always raining, this is the comparison I can't help making:</p>
+      <div class="punchline__body" aria-busy="true" aria-live="polite">
+        <p class="punchline__lead"><span class="skeleton skeleton--text"></span><span class="skeleton skeleton--text skeleton--short"></span></p>
+      </div>
+    </section>
+
+    <section class="climate" aria-live="polite">
+      <div class="climate__loading"><span class="skeleton skeleton--text skeleton--short"></span><span class="skeleton skeleton--chart"></span></div>
+    </section>
+
+    <section class="league">
+      <header class="league__head">
+        <div>
+          <h2 class="league__title">The rain league</h2>
+          <p class="league__summary" aria-live="polite"></p>
+        </div>
+        <div class="league__controls">
+          <div class="toggle" role="group" aria-label="Sort by">
+            <button type="button" data-sort="mm" aria-pressed="true">Least rain</button>
+            <button type="button" data-sort="dry" aria-pressed="false">Most dry days</button>
+          </div>
+          <div class="search">
+            <label class="visually-hidden" for="city-search">Add a city</label>
+            <input id="city-search" type="search" placeholder="Add a city…" autocomplete="off" spellcheck="false"
+              role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="city-results">
+            <ul id="city-results" role="listbox" hidden></ul>
+            <p class="search__status visually-hidden" aria-live="polite"></p>
+          </div>
+        </div>
+      </header>
+      <div class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Real data, no myths. Rainfall is daily precipitation from ERA5 reanalysis: <span class="footer__period"></span> for the cards, 1996–2025 for the long-term record. A dry day has less than 1 mm of rain. Current conditions refresh every 15 minutes.</p>
+    <p><a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a> (CC BY 4.0) · Made by <a href="https://sirlisko.com">Luca Lischetti</a>, who grew up on Lake Maggiore.</p>
+  </footer>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

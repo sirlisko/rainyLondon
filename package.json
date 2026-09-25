@@ -1,8 +1,13 @@
 {
   "name": "rainylondon",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node app"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "author": {
     "name": "Luca Lischetti",
@@ -13,18 +18,8 @@
     "type": "git",
     "url": "git://github.com/sirLisko/rainyLondon.git"
   },
-  "dependencies": {
-    "ejs": "^2.5.5",
-    "express": "~4.14.1",
-    "request": "^2.79.0"
-  },
   "devDependencies": {
-    "eslint": "^3.15.0",
-    "eslint-config-standard": "^6.2.1",
-    "eslint-plugin-promise": "^3.4.1",
-    "eslint-plugin-standard": "^2.0.1"
-  },
-  "eslintConfig": {
-    "extends": "standard"
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
   }
 }
