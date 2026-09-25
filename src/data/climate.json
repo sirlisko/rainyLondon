@@ -1,0 +1,87 @@
+{
+  "from": 1996,
+  "to": 2025,
+  "cities": [
+    {
+      "name": "London",
+      "latitude": 51.5074,
+      "longitude": -0.1278,
+      "avgMm": 671,
+      "avgDryDays": 237,
+      "yearsWetterThanLondon": 0
+    },
+    {
+      "name": "Lake Maggiore",
+      "place": "Verbania",
+      "latitude": 45.9214,
+      "longitude": 8.5518,
+      "avgMm": 2139,
+      "avgDryDays": 206,
+      "yearsWetterThanLondon": 30
+    },
+    {
+      "name": "Rome",
+      "latitude": 41.8919,
+      "longitude": 12.5113,
+      "avgMm": 871,
+      "avgDryDays": 260,
+      "yearsWetterThanLondon": 24
+    },
+    {
+      "name": "Paris",
+      "latitude": 48.8534,
+      "longitude": 2.3488,
+      "avgMm": 707,
+      "avgDryDays": 235,
+      "yearsWetterThanLondon": 19
+    },
+    {
+      "name": "Barcelona",
+      "latitude": 41.3888,
+      "longitude": 2.159,
+      "avgMm": 600,
+      "avgDryDays": 279,
+      "yearsWetterThanLondon": 9
+    },
+    {
+      "name": "Dublin",
+      "latitude": 53.3331,
+      "longitude": -6.2489,
+      "avgMm": 891,
+      "avgDryDays": 205,
+      "yearsWetterThanLondon": 30
+    },
+    {
+      "name": "Seattle",
+      "latitude": 47.6062,
+      "longitude": -122.3321,
+      "avgMm": 1275,
+      "avgDryDays": 209,
+      "yearsWetterThanLondon": 30
+    },
+    {
+      "name": "New York",
+      "latitude": 40.7143,
+      "longitude": -74.006,
+      "avgMm": 1173,
+      "avgDryDays": 243,
+      "yearsWetterThanLondon": 30
+    },
+    {
+      "name": "Sydney",
+      "latitude": -33.8679,
+      "longitude": 151.2073,
+      "avgMm": 777,
+      "avgDryDays": 262,
+      "yearsWetterThanLondon": 20
+    },
+    {
+      "name": "Tokyo",
+      "latitude": 35.6895,
+      "longitude": 139.6917,
+      "avgMm": 1479,
+      "avgDryDays": 234,
+      "yearsWetterThanLondon": 30
+    }
+  ]
+}
