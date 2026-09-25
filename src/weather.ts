@@ -1,4 +1,4 @@
-import type { Current, History } from './api'
+import type { Current, History, Hourly } from './api'
 
 export type Kind = 'clear' | 'partly' | 'cloud' | 'fog' | 'drizzle' | 'rain' | 'snow' | 'storm'
 
@@ -55,12 +55,11 @@ export interface Stats {
   last30DryDays: number
 }
 
-const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0)
-const dry = (xs: number[]): number => xs.filter(x => x < RAIN_DAY_MM).length
-
 export function stats (h: History): Stats {
   const p = h.precipitation
   const last30 = p.slice(-30)
+  const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0)
+  const dry = (xs: number[]): number => xs.filter(x => x < RAIN_DAY_MM).length
   return {
     totalMm: sum(p),
     dryDays: dry(p),
@@ -71,18 +70,43 @@ export function stats (h: History): Stats {
   }
 }
 
-export interface YearTotal {
-  year: number
-  mm: number
-  dryDays: number
+// Hourly model output reports traces; below this an hour doesn't count as rainy.
+const WET_HOUR_MM = 0.1
+
+export interface Outlook {
+  hoursSinceRain: number | null
+  dryHoursBeforeThisRain: number | null
+  restOfDayChance: number | null
 }
 
-export function yearlyTotals (h: History): YearTotal[] {
-  const byYear = new Map<number, number[]>()
-  h.dates.forEach((d, i) => {
-    const year = Number(d.slice(0, 4))
-    if (!byYear.has(year)) byYear.set(year, [])
-    byYear.get(year)!.push(h.precipitation[i])
-  })
-  return [...byYear].map(([year, p]) => ({ year, mm: sum(p), dryDays: dry(p) }))
+// `now` is the local ISO time from the forecast's `current` block, same timezone as `h.time`.
+export function outlook (h: Hourly, now: string, rainingNow: boolean): Outlook {
+  let cur = -1
+  h.time.forEach((t, i) => { if (t <= now) cur = i })
+  const wet = (i: number): boolean => h.precipitation[i] >= WET_HOUR_MM
+  const lastWetFrom = (from: number): number => {
+    for (let i = from; i >= 0; i--) if (wet(i)) return i
+    return -1
+  }
+
+  const lastWet = lastWetFrom(cur)
+  let dryHoursBeforeThisRain: number | null = null
+  if (rainingNow) {
+    let start = cur
+    while (start > 0 && wet(start - 1)) start--
+    const previous = lastWetFrom(start - 1)
+    dryHoursBeforeThisRain = previous < 0 ? null : start - previous - 1
+  }
+
+  const today = now.slice(0, 10)
+  const ahead = h.time
+    .map((t, i) => ({ t, p: h.probability[i] }))
+    .filter(({ t, p }, i) => i > cur && t.startsWith(today) && p != null)
+    .map(({ p }) => p!)
+
+  return {
+    hoursSinceRain: lastWet < 0 ? null : cur - lastWet,
+    dryHoursBeforeThisRain,
+    restOfDayChance: ahead.length ? Math.max(...ahead) : null
+  }
 }

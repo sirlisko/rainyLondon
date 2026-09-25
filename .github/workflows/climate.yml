@@ -1,0 +1,32 @@
+name: Refresh climate data
+
+on:
+  schedule:
+    # 10 January: the previous year is complete in ERA5 (it trails real time by about 5 days).
+    - cron: '0 6 10 1 *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    # The script sleeps through Open-Meteo rate limits, which can take a while.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run climate
+      - run: npm test
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/climate-data
+          commit-message: 'chore: refresh 30-year climate data'
+          title: 'chore: refresh 30-year climate data'
+          body: Yearly refresh of `src/data/climate.json` from Open-Meteo's historical API.

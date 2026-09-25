@@ -38,6 +38,17 @@ export const temp = (c: number): string =>
 
 export const tempUnit = (): string => units === 'metric' ? 'C' : 'F'
 
+// Rendered clocks carry their timezone so they can tick without re-rendering (and
+// re-announcing, or dropping focus in) whatever contains them.
+export const clock = (timezone: string): string =>
+  `<time data-tz="${esc(timezone)}">${localTime(timezone)}</time>`
+
+export function tickClocks (root: ParentNode): void {
+  root.querySelectorAll<HTMLElement>('time[data-tz]').forEach(el => {
+    el.textContent = localTime(el.dataset.tz!)
+  })
+}
+
 export function localTime (timezone: string, date = new Date()): string {
   return new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: timezone }).format(date)
 }

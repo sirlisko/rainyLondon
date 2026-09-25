@@ -1,5 +1,4 @@
 import type { City } from './cities'
-import { yearlyTotals, type YearTotal } from './weather'
 
 export interface Current {
   time: string
@@ -7,6 +6,12 @@ export interface Current {
   precipitation: number
   weatherCode: number
   isDay: boolean
+}
+
+export interface Hourly {
+  time: string[]
+  precipitation: number[]
+  probability: Array<number | null>
 }
 
 export interface History {
@@ -33,12 +38,9 @@ const HISTORY_DAYS = 365
 // ERA5 reanalysis trails real time by ~5 days; stay clear of the ragged edge.
 const ARCHIVE_LAG_DAYS = 6
 
-export const CLIMATE_YEARS = { from: 1996, to: 2025 }
-
-function cached<T> (key: string, ttlMs: number, load: () => Promise<T>, storage: 'session' | 'local' = 'session'): Promise<T> {
-  const store = (): Storage => storage === 'local' ? localStorage : sessionStorage
+function cached<T> (key: string, ttlMs: number, load: () => Promise<T>): Promise<T> {
   try {
-    const raw = store().getItem(key)
+    const raw = sessionStorage.getItem(key)
     if (raw) {
       const { at, value } = JSON.parse(raw) as { at: number, value: T }
       if (Date.now() - at < ttlMs) return Promise.resolve(value)
@@ -46,7 +48,7 @@ function cached<T> (key: string, ttlMs: number, load: () => Promise<T>, storage:
   } catch {}
   return load().then(value => {
     try {
-      store().setItem(key, JSON.stringify({ at: Date.now(), value }))
+      sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), value }))
     } catch {}
     return value
   })
@@ -92,6 +94,25 @@ export function fetchCurrent (city: City): Promise<Current> {
   })
 }
 
+export function fetchHourly (city: City): Promise<Hourly> {
+  const url = 'https://api.open-meteo.com/v1/forecast?' + new URLSearchParams({
+    latitude: String(city.latitude),
+    longitude: String(city.longitude),
+    hourly: 'precipitation,precipitation_probability',
+    past_days: '14',
+    forecast_days: '2',
+    timezone: city.timezone
+  }).toString()
+  return cached(`hourly:${url}`, 10 * 60_000, async () => {
+    const { hourly } = await getJson<{ hourly: { time: string[], precipitation: Array<number | null>, precipitation_probability: Array<number | null> } }>(url)
+    return {
+      time: hourly.time,
+      precipitation: hourly.precipitation.map(v => v ?? 0),
+      probability: hourly.precipitation_probability
+    }
+  })
+}
+
 function archiveUrl (city: City, start: string, end: string): string {
   return 'https://archive-api.open-meteo.com/v1/archive?' + new URLSearchParams({
     latitude: String(city.latitude),
@@ -115,12 +136,6 @@ export function fetchHistory (city: City): Promise<History> {
   const { start, end } = historyRange()
   const url = archiveUrl(city, start, end)
   return cached(`hist:${url}`, 6 * 60 * 60_000, () => fetchDaily(url))
-}
-
-// Only the per-year totals are cached: 30 years of raw daily values would crowd out storage.
-export function fetchYearly (city: City): Promise<YearTotal[]> {
-  const url = archiveUrl(city, `${CLIMATE_YEARS.from}-01-01`, `${CLIMATE_YEARS.to}-12-31`)
-  return cached(`years:${url}`, 30 * 24 * 60 * 60_000, async () => yearlyTotals(await fetchDaily(url)), 'local')
 }
 
 const toResult = (r: GeoResult): SearchResult => ({

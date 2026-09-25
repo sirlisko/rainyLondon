@@ -54,6 +54,12 @@ export function pickRandom (pool: City[], n: number): City[] {
 
 export const cityKey = (c: City): string => `${c.latitude.toFixed(2)},${c.longitude.toFixed(2)}`
 
+// IP geolocation is only city-accurate, so anything this close counts as the same place.
+const SAME_PLACE_KM = 30
+
+export const isSamePlace = (a: Pick<City, 'latitude' | 'longitude'>, b: Pick<City, 'latitude' | 'longitude'>): boolean =>
+  distanceKm(a, b) < SAME_PLACE_KM
+
 export function distanceKm (a: Pick<City, 'latitude' | 'longitude'>, b: Pick<City, 'latitude' | 'longitude'>): number {
   const rad = (d: number): number => d * Math.PI / 180
   const dLat = rad(b.latitude - a.latitude)

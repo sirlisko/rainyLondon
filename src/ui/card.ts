@@ -2,7 +2,7 @@ import type { Current } from '../api'
 import type { City } from '../cities'
 import { describe, isRaining, RAIN_DAY_MM, type Stats } from '../weather'
 import { icon } from './icons'
-import { esc, localTime, rain, rainUnit, rainValue, temp } from './format'
+import { clock, esc, rain, rainUnit, rainValue, temp } from './format'
 
 export type Role = 'london' | 'home' | 'you' | 'random' | 'added'
 
@@ -50,7 +50,7 @@ export function renderCard (e: Entry, scale: Scale, rank: number | undefined, fr
       <div>
         <p class="card__tag">${rankLabel}${tag}</p>
         <h3 class="card__name">${esc(city.name)}</h3>
-        <p class="card__place">${esc(place)} · ${localTime(city.timezone)}</p>
+        <p class="card__place">${esc(place)} · ${clock(city.timezone)}</p>
       </div>
       ${removable ? `<button class="card__remove" data-remove="${esc(e.key)}" aria-label="Remove ${esc(city.name)}">×</button>` : ''}
     </header>`
