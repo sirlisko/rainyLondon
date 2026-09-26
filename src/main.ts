@@ -6,11 +6,12 @@ import '@fontsource/inter/600.css'
 import './styles.css'
 import { fetchCityById, fetchCurrent, fetchHistory, fetchHourly, fetchVisitorCity, historyRange, type Current, type SearchResult } from './api'
 import { cityKey, isSamePlace, LONDON, pickRandom, POOL, VERBANIA, type City } from './cities'
-import { isRaining, outlook, stats, type Outlook } from './weather'
+import { describe, isRaining, outlook, stats, type Outlook } from './weather'
 import { renderCard, type Entry, type Role, type Scale } from './ui/card'
 import { renderClimate, renderClimateRefs, renderHeadline } from './ui/climate'
 import { renderHero, renderHeroError, shareText } from './ui/hero'
 import { mountSearch } from './ui/search'
+import { paintTab } from './ui/tab'
 import { getUnits, setUnits, shortDate, tickClocks, type Units } from './ui/format'
 
 type SortBy = 'mm' | 'dry'
@@ -115,6 +116,7 @@ function render (): void {
 
 function paintHero (): void {
   if (!londonNow) return
+  paintTab(isRaining(londonNow), describe(londonNow.weatherCode).kind, londonNow.isDay)
   renderHero(hero, {
     current: londonNow,
     outlook: londonOutlook,
