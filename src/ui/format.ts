@@ -23,7 +23,13 @@ const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;'
 
 export const esc = (s: string): string => s.replace(/[&<>"']/g, c => ESCAPES[c])
 
-const whole = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 })
+export function ordinal (n: number): string {
+  const s = ['th', 'st', 'nd', 'rd']
+  const v = n % 100
+  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
+}
+
+const whole =new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 })
 const oneDecimal = new Intl.NumberFormat('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 export const rainUnit = (): string => units === 'metric' ? 'mm' : 'in'

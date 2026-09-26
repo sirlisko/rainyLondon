@@ -1,5 +1,5 @@
 import climate from '../data/climate.json'
-import { esc, rain } from './format'
+import { esc, ordinal, rain } from './format'
 
 const LAKE = 'Lake Maggiore'
 // Places people picture as sunny or glamorous; the headline names the ones London beats.
@@ -12,12 +12,6 @@ const yearCount = climate.to - climate.from + 1
 
 export const joinNames = (names: string[]): string =>
   names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
-
-function ordinal (n: number): string {
-  const s = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
-}
 
 export const rivalsBeaten = (): string[] => HEADLINE_RIVALS
   .filter(name => (cities.find(c => c.name === name)?.avgMm ?? 0) > london.avgMm)

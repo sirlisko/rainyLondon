@@ -507,6 +507,7 @@ main { width: var(--column); margin: 0 auto; }
 .now--dry { background: var(--dry-soft); color: var(--dry); }
 .now--wet { background: var(--accent-soft); color: var(--accent); }
 .now--loading { background: var(--skeleton); min-height: 44px; }
+.now--unavailable { background: var(--skeleton); color: var(--muted); min-height: 44px; }
 .now__verdict { font-weight: 600; }
 .now__detail { color: var(--muted); margin-left: auto; text-align: right; }
 
