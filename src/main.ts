@@ -17,6 +17,8 @@ type SortBy = 'mm' | 'dry'
 
 const RANDOM_COUNT = 4
 const REFRESH_MS = 15 * 60_000
+const SITE_URL = 'https://rainylondon.sirlisko.com/'
+const ADDED_KEY = 'added'
 const hero = document.querySelector<HTMLElement>('.hero')!
 const grid = document.querySelector<HTMLElement>('.grid')!
 const headline = document.querySelector<HTMLElement>('.punchline')!
@@ -156,17 +158,32 @@ async function refreshNow (): Promise<void> {
   render()
 }
 
+const parseIds = (raw: string): number[] =>
+  raw.split(',').map(Number).filter(n => Number.isInteger(n) && n > 0)
+
+const addedIds = (): number[] => entries.flatMap(e => e.role === 'added' && e.city.id ? [e.city.id] : [])
+
+function withAdded (href: string, ids: number[]): URL {
+  const url = new URL(href)
+  if (ids.length) url.searchParams.set('add', ids.join(','))
+  else url.searchParams.delete('add')
+  return url
+}
+
+// A shared link's cities win; otherwise bring back the visitor's own from last time.
 function readAdded (): number[] {
-  const raw = new URLSearchParams(location.search).get('add') ?? ''
-  return raw.split(',').map(Number).filter(n => Number.isInteger(n) && n > 0)
+  const fromUrl = new URLSearchParams(location.search).get('add')
+  if (fromUrl !== null) return parseIds(fromUrl)
+  let saved: number[] = []
+  try { saved = parseIds(localStorage.getItem(ADDED_KEY) ?? '') } catch {}
+  if (saved.length) history.replaceState(null, '', withAdded(location.href, saved))
+  return saved
 }
 
 function writeAdded (): void {
-  const ids = entries.flatMap(e => e.role === 'added' && e.city.id ? [e.city.id] : [])
-  const url = new URL(location.href)
-  if (ids.length) url.searchParams.set('add', ids.join(','))
-  else url.searchParams.delete('add')
-  history.replaceState(null, '', url)
+  const ids = addedIds()
+  history.replaceState(null, '', withAdded(location.href, ids))
+  try { localStorage.setItem(ADDED_KEY, ids.join(',')) } catch {}
 }
 
 function onPick (city: SearchResult): void {
@@ -216,7 +233,7 @@ void loadHero()
 document.querySelector('.hero__share')!.addEventListener('click', async e => {
   const button = e.currentTarget as HTMLButtonElement
   const text = londonNow ? shareText(londonNow) : document.title
-  const url = 'https://rainylondon.sirlisko.com/'
+  const url = withAdded(SITE_URL, addedIds()).href
   if (navigator.share) {
     try { await navigator.share({ title: document.title, text, url }) } catch {}
     return
