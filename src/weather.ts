@@ -73,10 +73,23 @@ export function stats (h: History): Stats {
 // Hourly model output reports traces; below this an hour doesn't count as rainy.
 const WET_HOUR_MM = 0.1
 
+export const AHEAD_HOURS = 12
+// Models forecast trace amounts in most hours; only call an hour wet when rain is also more likely than not.
+const LIKELY_CHANCE = 50
+
+export interface HourAhead {
+  time: string
+  chance: number | null
+  likely: boolean
+}
+
 export interface Outlook {
   hoursSinceRain: number | null
   dryHoursBeforeThisRain: number | null
   restOfDayChance: number | null
+  // First hour ahead where the rain is expected to start (if dry now) or stop (if raining).
+  turn: { at: string, tomorrow: boolean } | null
+  ahead: HourAhead[]
 }
 
 // `now` is the local ISO time from the forecast's `current` block, same timezone as `h.time`.
@@ -104,9 +117,18 @@ export function outlook (h: Hourly, now: string, rainingNow: boolean): Outlook {
     .filter(({ t, p }, i) => i > cur && t.startsWith(today) && p != null)
     .map(({ p }) => p!)
 
+  const next = h.time.slice(cur + 1, cur + 1 + AHEAD_HOURS).map((time, k): HourAhead => {
+    const i = cur + 1 + k
+    const chance = h.probability[i]
+    return { time, chance, likely: wet(i) && (chance ?? 100) >= LIKELY_CHANCE }
+  })
+  const turnAt = next.find(x => x.likely !== rainingNow)?.time
+
   return {
     hoursSinceRain: lastWet < 0 ? null : cur - lastWet,
     dryHoursBeforeThisRain,
-    restOfDayChance: ahead.length ? Math.max(...ahead) : null
+    restOfDayChance: ahead.length ? Math.max(...ahead) : null,
+    turn: turnAt ? { at: turnAt.slice(11, 16), tomorrow: !turnAt.startsWith(today) } : null,
+    ahead: next
   }
 }
