@@ -106,7 +106,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   min-height: 100svh;
   display: grid;
   grid-template-rows: 1fr auto;
-  padding: var(--gutter);
+  /* Clears the absolutely positioned brand and units toggle when the content is taller than a short viewport. */
+  padding: calc(var(--gutter) + 3rem) var(--gutter) var(--gutter);
   color: var(--hero-ink);
   background: radial-gradient(120% 80% at 80% 0%, var(--sky-1), var(--sky-2) 70%);
   overflow: hidden;
