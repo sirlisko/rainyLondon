@@ -19,7 +19,7 @@ const moon = (scale = 1, dx = 0, dy = 0): string =>
 
 function behindCloud (content: string): string {
   const id = `ic${uid++}`
-  return `<mask id="${id}"><rect x="0" y="0" width="24" height="24" fill="#fff"/>
+  return `<mask id="${id}" maskUnits="userSpaceOnUse" x="-2" y="-2" width="28" height="28"><rect x="-2" y="-2" width="28" height="28" fill="#fff"/>
     <path transform="${PARTLY}" d="${CLOUD}" fill="#000" stroke="#000" stroke-width="4.5"/></mask>
     <g mask="url(#${id})">${content}</g><path class="i-cloud" transform="${PARTLY}" d="${CLOUD}"/>`
 }
