@@ -70,7 +70,10 @@ export function renderCard (e: Entry, scale: Scale, rank: number | undefined, fr
           <span class="now__detail">${temp(e.current.temperature)} · ${label}</span>
         </div>`
       })()
-    : '<div class="now now--loading"><span class="skeleton skeleton--line"></span></div>'
+    // Stats only arrive once both requests have settled, so without a reading by then it failed.
+    : e.stats
+      ? '<div class="now now--unavailable">Current conditions unavailable</div>'
+      : '<div class="now now--loading"><span class="skeleton skeleton--line"></span></div>'
 
   const s = e.stats
   const body = s
