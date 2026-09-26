@@ -526,6 +526,7 @@ main { width: var(--column); margin: 0 auto; }
 .figure dd { margin: 0.1rem 0 0.45rem; }
 .figure__num { font: 400 2.25rem/1 var(--serif); font-variant-numeric: tabular-nums; }
 .figure__unit { color: var(--muted); font-size: 0.875rem; }
+.figure__note { margin: 0.4rem 0 0; font-size: 0.75rem; color: var(--muted); }
 
 .bar { height: 8px; border-radius: 999px; background: var(--skeleton); overflow: hidden; }
 .bar span {

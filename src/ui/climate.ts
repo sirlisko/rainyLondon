@@ -1,4 +1,5 @@
 import climate from '../data/climate.json'
+import { isSamePlace, type City } from '../cities'
 import { esc, rain } from './format'
 
 const LAKE = 'Lake Maggiore'
@@ -22,6 +23,18 @@ function ordinal (n: number): string {
 export const rivalsBeaten = (): string[] => HEADLINE_RIVALS
   .filter(name => (cities.find(c => c.name === name)?.avgMm ?? 0) > london.avgMm)
   .slice(0, 3)
+
+// Within this, a year is too close to the average to call it wetter or drier.
+const ABOUT_AVERAGE_PCT = 3
+
+// Both figures come from the same ERA5 dataset, so a place's last 12 months compare fairly with its own average.
+export function versusAverage (place: Pick<City, 'latitude' | 'longitude'>, last12Mm: number): string | undefined {
+  const avg = cities.find(c => isSamePlace(c, place))?.avgMm
+  if (!avg) return undefined
+  const pct = Math.round((last12Mm / avg - 1) * 100)
+  if (Math.abs(pct) < ABOUT_AVERAGE_PCT) return `About average for ${period}`
+  return `${Math.abs(pct)}% ${pct < 0 ? 'drier' : 'wetter'} than its ${period} average`
+}
 
 export function renderHeadline (root: HTMLElement): void {
   const beaten = rivalsBeaten()

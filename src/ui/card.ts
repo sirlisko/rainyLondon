@@ -1,6 +1,7 @@
 import type { Current } from '../api'
 import type { City } from '../cities'
 import { describe, isRaining, RAIN_DAY_MM, type Stats } from '../weather'
+import { versusAverage } from './climate'
 import { icon } from './icons'
 import { clock, esc, rain, rainUnit, rainValue, temp } from './format'
 
@@ -73,6 +74,7 @@ export function renderCard (e: Entry, scale: Scale, rank: number | undefined, fr
     : '<div class="now now--loading"><span class="skeleton skeleton--line"></span></div>'
 
   const s = e.stats
+  const note = s && versusAverage(city, s.totalMm)
   const body = s
     ? `
       <dl class="figures">
@@ -80,6 +82,7 @@ export function renderCard (e: Entry, scale: Scale, rank: number | undefined, fr
           <dt>Rain, last 12 months</dt>
           <dd><span class="figure__num">${rainValue(s.totalMm)}</span> <span class="figure__unit">${rainUnit()}</span></dd>
           <div class="bar" aria-hidden="true"><span style="--w:${(s.totalMm / scale.maxTotalMm) * 100}%"></span></div>
+          ${note ? `<p class="figure__note">${note}</p>` : ''}
         </div>
         <div class="figure">
           <dt>Dry days (under 1 mm)</dt>
