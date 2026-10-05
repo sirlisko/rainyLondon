@@ -6,11 +6,12 @@ import '@fontsource/inter/600.css'
 import './styles.css'
 import { fetchCityById, fetchCurrent, fetchHistory, fetchHourly, fetchVisitorCity, historyRange, type Current, type SearchResult } from './api'
 import { cityKey, isSamePlace, LONDON, pickRandom, POOL, VERBANIA, type City } from './cities'
-import { isRaining, outlook, stats, type Outlook } from './weather'
-import { renderCard, type Entry, type Role, type Scale } from './ui/card'
-import { renderClimate, renderClimateRefs, renderHeadline } from './ui/climate'
+import { describe, isRaining, outlook, stats, type Outlook } from './weather'
+import { renderRow, type Entry, type Role, type Scale } from './ui/row'
+import { renderClimate, renderClimateRefs } from './ui/climate'
 import { renderHero, renderHeroError, shareText } from './ui/hero'
 import { mountSearch } from './ui/search'
+import { paintTab } from './ui/tab'
 import { getUnits, ordinal, setUnits, shortDate, tickClocks, type Units } from './ui/format'
 
 type SortBy = 'mm' | 'dry'
@@ -18,9 +19,10 @@ type SortBy = 'mm' | 'dry'
 const RANDOM_COUNT = 4
 const REFRESH_MS = 15 * 60_000
 const HERO_RETRY_MS = 60_000
+const SITE_URL = 'https://rainylondon.sirlisko.com/'
+const ADDED_KEY = 'added'
 const hero = document.querySelector<HTMLElement>('.hero')!
-const grid = document.querySelector<HTMLElement>('.grid')!
-const headline = document.querySelector<HTMLElement>('.punchline')!
+const rows = document.querySelector<HTMLElement>('.rows')!
 const climate = document.querySelector<HTMLElement>('.climate')!
 const summary = document.querySelector<HTMLElement>('.league__summary')!
 
@@ -75,16 +77,16 @@ function renderSummary (list: Entry[]): void {
   const i = ready.findIndex(e => e.role === 'london')
   const what = sortBy === 'mm' ? 'least total rain' : 'most dry days'
   const html = list !== entries && i >= 0
-    ? `Of these ${ready.length} places, London has the <strong>${i === 0 ? '' : ordinal(i + 1) + ' '}${what}</strong>.`
+    ? `Over the last 12 months, London has the <strong>${i === 0 ? '' : ordinal(i + 1) + ' '}${what}</strong> of these ${ready.length} places.`
     : ''
   // Live region: rewriting identical text would make screen readers repeat it.
   if (html !== lastSummary) summary.innerHTML = lastSummary = html
 }
 
-// Card buttons are identified by their data attribute, so focus can survive a re-render.
+// Row buttons are identified by their data attribute, so focus can survive a re-render.
 function focusedControl (): string | undefined {
   const el = document.activeElement
-  if (!(el instanceof HTMLElement) || !grid.contains(el)) return undefined
+  if (!(el instanceof HTMLElement) || !rows.contains(el)) return undefined
   for (const attr of ['data-remove', 'data-retry']) {
     const value = el.getAttribute(attr)
     if (value !== null) return `[${attr}="${CSS.escape(value)}"]`
@@ -97,17 +99,18 @@ function render (): void {
   const ranked = list !== entries
   const s = scale()
   const focused = focusedControl()
-  grid.innerHTML = list.map((e, i) => {
+  rows.innerHTML = list.map((e, i) => {
     const fresh = !shown.has(e.key)
     shown.add(e.key)
-    return renderCard(e, s, ranked ? i + 1 : undefined, fresh)
+    return renderRow(e, s, ranked ? i + 1 : undefined, fresh)
   }).join('')
-  if (focused) grid.querySelector<HTMLElement>(focused)?.focus()
+  if (focused) rows.querySelector<HTMLElement>(focused)?.focus()
   renderSummary(list)
 }
 
 function paintHero (): void {
   if (!londonNow) return
+  paintTab(isRaining(londonNow), describe(londonNow.weatherCode).kind, londonNow.isDay)
   renderHero(hero, {
     current: londonNow,
     outlook: londonOutlook,
@@ -139,7 +142,6 @@ async function loadVisitorNow (): Promise<void> {
 
 function renderAll (): void {
   paintHero()
-  renderHeadline(headline)
   renderClimate(climate)
   renderClimateRefs(document)
   render()
@@ -154,23 +156,38 @@ async function refreshNow (): Promise<void> {
   render()
 }
 
+const parseIds = (raw: string): number[] =>
+  raw.split(',').map(Number).filter(n => Number.isInteger(n) && n > 0)
+
+const addedIds = (): number[] => entries.flatMap(e => e.role === 'added' && e.city.id ? [e.city.id] : [])
+
+function withAdded (href: string, ids: number[]): URL {
+  const url = new URL(href)
+  if (ids.length) url.searchParams.set('add', ids.join(','))
+  else url.searchParams.delete('add')
+  return url
+}
+
+// A shared link's cities win; otherwise bring back the visitor's own from last time.
 function readAdded (): number[] {
-  const raw = new URLSearchParams(location.search).get('add') ?? ''
-  return raw.split(',').map(Number).filter(n => Number.isInteger(n) && n > 0)
+  const fromUrl = new URLSearchParams(location.search).get('add')
+  if (fromUrl !== null) return parseIds(fromUrl)
+  let saved: number[] = []
+  try { saved = parseIds(localStorage.getItem(ADDED_KEY) ?? '') } catch {}
+  if (saved.length) history.replaceState(null, '', withAdded(location.href, saved))
+  return saved
 }
 
 function writeAdded (): void {
-  const ids = entries.flatMap(e => e.role === 'added' && e.city.id ? [e.city.id] : [])
-  const url = new URL(location.href)
-  if (ids.length) url.searchParams.set('add', ids.join(','))
-  else url.searchParams.delete('add')
-  history.replaceState(null, '', url)
+  const ids = addedIds()
+  history.replaceState(null, '', withAdded(location.href, ids))
+  try { localStorage.setItem(ADDED_KEY, ids.join(',')) } catch {}
 }
 
 function onPick (city: SearchResult): void {
   const existing = byKey(cityKey(city))
   if (existing) {
-    grid.querySelector(`[data-key="${CSS.escape(existing.key)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    rows.querySelector(`[data-key="${CSS.escape(existing.key)}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     return
   }
   const entry = addEntry(city, 'added')!
@@ -179,7 +196,7 @@ function onPick (city: SearchResult): void {
   void load(entry)
 }
 
-grid.addEventListener('click', e => {
+rows.addEventListener('click', e => {
   const target = e.target as HTMLElement
   const remove = target.closest<HTMLElement>('[data-remove]')?.dataset.remove
   const retry = target.closest<HTMLElement>('[data-retry]')?.dataset.retry
@@ -214,7 +231,7 @@ void loadHero()
 document.querySelector('.hero__share')!.addEventListener('click', async e => {
   const button = e.currentTarget as HTMLButtonElement
   const text = londonNow ? shareText(londonNow) : document.title
-  const url = 'https://rainylondon.sirlisko.com/'
+  const url = withAdded(SITE_URL, addedIds()).href
   if (navigator.share) {
     try { await navigator.share({ title: document.title, text, url }) } catch {}
     return
@@ -232,7 +249,6 @@ const initial: Array<[City, Role]> = [
   ...pickRandom(POOL, RANDOM_COUNT).map((c): [City, Role] => [c, 'random'])
 ]
 for (const [city, role] of initial) addEntry(city, role)
-renderHeadline(headline)
 renderClimate(climate)
 renderClimateRefs(document)
 render()
@@ -253,7 +269,7 @@ fetchVisitorCity()
     }
     const entry = addEntry(city, 'you')
     if (!entry) return
-    // The visitor's city takes the place of one random city, keeping the grid at six.
+    // The visitor's city takes the place of one random city, keeping the league at six.
     const lastRandom = entries.findLast(e => e.role === 'random')
     entries = entries.filter(e => e !== entry && e !== lastRandom)
     entries.splice(2, 0, entry)

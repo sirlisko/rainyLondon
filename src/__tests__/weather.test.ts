@@ -71,6 +71,24 @@ group('outlook', () => {
     expect(outlook(h, nowAt(h, 12), false).restOfDayChance).toBe(70)
   })
 
+  it('finds when rain is likely to start, ignoring unlikely traces', () => {
+    const h = hourly(48, [14, 16, 17], i => i === 14 ? 20 : 70)
+    expect(outlook(h, nowAt(h, 12), false).turn).toEqual({ at: '16:00', tomorrow: false })
+  })
+
+  it('finds when the current rain should stop, flagging tomorrow', () => {
+    const h = hourly(48, [22, 23, 24, 25], () => 80)
+    expect(outlook(h, nowAt(h, 22), true).turn).toEqual({ at: '02:00', tomorrow: true })
+  })
+
+  it('looks twelve hours ahead', () => {
+    const h = hourly(48, [30], () => 90)
+    const o = outlook(h, nowAt(h, 12), false)
+    expect(o.ahead).toHaveLength(12)
+    expect(o.ahead[0].time).toBe(h.time[13])
+    expect(o.turn).toBeNull()
+  })
+
   it('has no rest-of-day chance in the last hour of the day', () => {
     const h = hourly(48, [], () => 40)
     expect(outlook(h, nowAt(h, 23), false).restOfDayChance).toBeNull()

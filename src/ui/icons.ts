@@ -15,11 +15,11 @@ function sun (cx: number, cy: number, r: number, rays: [number, number]): string
 }
 
 const moon = (scale = 1, dx = 0, dy = 0): string =>
-  `<path transform="translate(${dx} ${dy}) scale(${scale})" d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>`
+  `<path class="i-moon" transform="translate(${dx} ${dy}) scale(${scale})" d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>`
 
 function behindCloud (content: string): string {
   const id = `ic${uid++}`
-  return `<mask id="${id}"><rect x="0" y="0" width="24" height="24" fill="#fff"/>
+  return `<mask id="${id}" maskUnits="userSpaceOnUse" x="-2" y="-2" width="28" height="28"><rect x="-2" y="-2" width="28" height="28" fill="#fff"/>
     <path transform="${PARTLY}" d="${CLOUD}" fill="#000" stroke="#000" stroke-width="4.5"/></mask>
     <g mask="url(#${id})">${content}</g><path class="i-cloud" transform="${PARTLY}" d="${CLOUD}"/>`
 }
