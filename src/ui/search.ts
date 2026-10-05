@@ -32,6 +32,8 @@ export function mountSearch (root: HTMLElement, onPick: (city: SearchResult) => 
   const pick = (i: number): void => {
     const r = results[i]
     if (!r) return
+    clearTimeout(timer)
+    inflight?.abort()
     onPick(r)
     input.value = ''
     results = []
@@ -43,6 +45,8 @@ export function mountSearch (root: HTMLElement, onPick: (city: SearchResult) => 
     clearTimeout(timer)
     const q = input.value.trim()
     if (q.length < 2) { results = []; close(); return }
+    // The listed results are for the previous query until the new search lands, so Enter mustn't pick one.
+    if (active >= 0) { active = -1; paint() }
     timer = window.setTimeout(async () => {
       inflight?.abort()
       inflight = new AbortController()

@@ -66,7 +66,10 @@ export function renderRow (e: Entry, scale: Scale, rank: number | undefined, fre
           <span><strong>${wet ? 'Raining' : 'Dry'}</strong>, ${temp(e.current.temperature)}</span>
           <span class="row__label">${label}</span></p>`
       })()
-    : '<p class="row__now"><span class="skeleton skeleton--line"></span></p>'
+    // Stats only arrive once both requests have settled, so without a reading by then it failed.
+    : e.stats
+      ? '<p class="row__now row__now--unavailable">Weather unavailable</p>'
+      : '<p class="row__now"><span class="skeleton skeleton--line"></span></p>'
 
   const s = e.stats
   const note = s && versusAverage(city, s.totalMm)

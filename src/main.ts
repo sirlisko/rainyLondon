@@ -12,12 +12,13 @@ import { renderClimate, renderClimateRefs } from './ui/climate'
 import { renderHero, renderHeroError, shareText } from './ui/hero'
 import { mountSearch } from './ui/search'
 import { paintTab } from './ui/tab'
-import { getUnits, setUnits, shortDate, tickClocks, type Units } from './ui/format'
+import { getUnits, ordinal, setUnits, shortDate, tickClocks, type Units } from './ui/format'
 
 type SortBy = 'mm' | 'dry'
 
 const RANDOM_COUNT = 4
 const REFRESH_MS = 15 * 60_000
+const HERO_RETRY_MS = 60_000
 const SITE_URL = 'https://rainylondon.sirlisko.com/'
 const ADDED_KEY = 'added'
 const hero = document.querySelector<HTMLElement>('.hero')!
@@ -71,12 +72,6 @@ function sorted (): Entry[] {
   return [...entries].sort((a, b) => metric(a) - metric(b))
 }
 
-const ordinal = (n: number): string => {
-  const s = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return n + (s[(v - 20) % 10] ?? s[v] ?? s[0])
-}
-
 function renderSummary (list: Entry[]): void {
   const ready = list.filter(e => e.stats)
   const i = ready.findIndex(e => e.role === 'london')
@@ -126,7 +121,10 @@ function paintHero (): void {
 async function loadHero (): Promise<void> {
   const [current, hourly] = await Promise.allSettled([fetchCurrent(LONDON), fetchHourly(LONDON)])
   if (current.status === 'rejected') {
-    if (!londonNow) renderHeroError(hero)
+    if (!londonNow) {
+      renderHeroError(hero)
+      setTimeout(() => { void loadHero() }, HERO_RETRY_MS)
+    }
     return
   }
   londonNow = current.value
@@ -291,7 +289,8 @@ readAdded().forEach(id => {
     .catch(() => {})
 })
 
-setInterval(() => { void refreshNow() }, REFRESH_MS)
+// Hidden tabs skip the poll; visibilitychange catches them up on return.
+setInterval(() => { if (!document.hidden) void refreshNow() }, REFRESH_MS)
 setInterval(() => { if (!document.hidden) tickClocks(document) }, 60_000)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && Date.now() - lastRefresh > REFRESH_MS) void refreshNow()

@@ -105,5 +105,5 @@ export function renderHeroError (el: HTMLElement): void {
   el.dataset.state = 'error'
   el.setAttribute('aria-busy', 'false')
   el.querySelector('.hero__answer')!.textContent = 'Hmm.'
-  el.querySelector('.hero__detail')!.textContent = "Couldn't reach the weather service. Try again in a minute."
+  el.querySelector('.hero__detail')!.textContent = "Couldn't reach the weather service. Trying again in a minute…"
 }

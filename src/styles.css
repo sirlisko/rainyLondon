@@ -484,6 +484,7 @@ main { width: var(--column); margin: 0 auto; }
 .row__now .icon { grid-row: span 2; width: 24px; height: 24px; }
 .row__now--dry { color: var(--dry-ink); }
 .row__now--wet { color: var(--accent); }
+.row__now--unavailable { font-size: 0.8125rem; color: var(--muted); }
 .row__now strong { font-weight: 600; }
 .row__label { font-size: 0.8125rem; color: var(--muted); }
 
