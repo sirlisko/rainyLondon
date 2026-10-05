@@ -36,16 +36,6 @@ export function versusAverage (place: Pick<City, 'latitude' | 'longitude'>, last
   return `${Math.abs(pct)}% ${pct < 0 ? 'drier' : 'wetter'} than its ${period} average`
 }
 
-export function renderHeadline (root: HTMLElement): void {
-  const beaten = rivalsBeaten()
-  root.innerHTML = `
-    <p class="punchline__lead">${beaten.length
-      ? `London gets less rain than <strong>${joinNames(beaten)}</strong>.`
-      : `London gets <strong>${rain(london.avgMm)}</strong> of rain a year.`}</p>
-    <p class="punchline__sub">On average it gets ${rain(london.avgMm)} of rain a year, and ${london.avgDryDays} of its 365 days are dry.
-      <span class="punchline__period">Yearly averages, ${period}</span></p>`
-}
-
 // Figures quoted in static copy (footer, data note) so they follow the data file and units.
 export function renderClimateRefs (root: ParentNode): void {
   root.querySelectorAll<HTMLElement>('[data-climate-period]').forEach(el => { el.textContent = period })
@@ -60,6 +50,7 @@ export function renderClimate (root: HTMLElement): void {
   const max = ranked.at(-1)!.avgMm
   const position = ranked.indexOf(london) + 1
   const lake = cities.find(c => c.name === LAKE)
+  const beaten = rivalsBeaten()
 
   const rows = ranked.map((c, i) => {
     const cls = c === london ? ' rank--london' : c === lake ? ' rank--lake' : ''
@@ -67,7 +58,7 @@ export function renderClimate (root: HTMLElement): void {
       ? '<span class="rank__note">where I grew up</span>'
       : c === london ? '<span class="rank__note">where I live now</span>' : ''
     return `<li class="rank${cls}">
-      <span class="rank__pos">${String(i + 1).padStart(2, '0')}</span>
+      <span class="rank__pos">${i + 1}</span>
       <span class="rank__name">${esc(c.name)}${note}</span>
       <span class="rank__bar" aria-hidden="true"><span style="--w:${(c.avgMm / max) * 100}%"></span></span>
       <span class="rank__value">${rain(c.avgMm)}</span>
@@ -82,9 +73,11 @@ export function renderClimate (root: HTMLElement): void {
     : ''
 
   root.innerHTML = `
-    <h2 class="climate__title">Thirty years of rain</h2>
-    <p class="climate__lead">Average rain per year, ${period}. Of these ${cities.length} places, London is the
-      <strong>${position === 1 ? '' : `${ordinal(position)} `}driest</strong>.</p>
+    <h2 class="climate__title">${beaten.length
+      ? `London gets less rain than ${joinNames(beaten)}.`
+      : `London gets ${rain(london.avgMm)} of rain a year.`}</h2>
+    <p class="climate__lead">Over ${period} it averaged ${rain(london.avgMm)} of rain a year, and ${london.avgDryDays} of its 365 days were dry.
+      Of these ${cities.length} places, it's the <strong>${position === 1 ? '' : `${ordinal(position)} `}driest</strong>.</p>
     <ol class="ranking">${rows}</ol>
     ${lakeNote}`
 }

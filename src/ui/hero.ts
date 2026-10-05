@@ -76,21 +76,25 @@ export function renderHero (el: HTMLElement, { current, outlook, visitor }: Hero
   el.dataset.state = raining ? 'wet' : current.isDay ? 'dry' : 'night'
   el.dataset.kind = kind
   el.setAttribute('aria-busy', 'false')
-  el.querySelector('.hero__answer')!.textContent = raining ? 'Yes.' : 'No.'
-  el.querySelector('.hero__icon')!.innerHTML = icon(kind, current.isDay)
+  // The live weather stands in for the answer's full stop. It's only redrawn when the weather changes,
+  // so refreshes and unit toggles don't replay its entrance or restart its animations.
+  const answerEl = el.querySelector<HTMLElement>('.hero__answer')!
+  const drawn = `${raining}|${kind}|${current.isDay}`
+  if (answerEl.dataset.drawn !== drawn) {
+    answerEl.dataset.drawn = drawn
+    answerEl.innerHTML = `${raining ? 'Yes' : 'No'}<span class="hero__dot">${icon(kind, current.isDay)}</span>`
+  }
   el.querySelector('.hero__detail')!.innerHTML =
     `${temp(current.temperature)}${tempUnit()} · ${label} · ${clock(LONDON.timezone)} in London`
   // The hero repaints on refreshes and unit changes; only a changed answer is worth announcing.
   const announce = el.querySelector('.hero__announce')!
   const answer = raining ? "Yes, it's raining in London right now." : "No, it's not raining in London right now."
   if (announce.textContent !== answer) announce.textContent = answer
-  el.querySelector('.hero__outlook')!.innerHTML = outlook
-    ? outlookLines(outlook, raining).map(l => `<span>${l}</span>`).join('')
-    : ''
+  el.querySelector('.hero__outlook')!.textContent = outlook ? outlookLines(outlook, raining).join(' ') : ''
   el.querySelector('.hero__ahead')!.innerHTML = outlook ? aheadStrip(outlook.ahead) : ''
   el.querySelector('.hero__quip')!.textContent = raining
-    ? 'Fine, it is. Enjoy it while it lasts. Scroll down for some perspective.'
-    : 'Surprised? Scroll down: the numbers say London is drier than you think.'
+    ? 'Fine, it is. Enjoy it while it lasts.'
+    : 'Surprised? The numbers say London is drier than you think.'
   el.querySelector('.hero__visitor')!.innerHTML = visitor
     ? `And in ${esc(visitor.name)}? <strong>${isRaining(visitor.current) ? 'Raining' : 'Dry'}</strong>, ${temp(visitor.current.temperature)}${tempUnit()}.`
     : ''
@@ -98,6 +102,7 @@ export function renderHero (el: HTMLElement, { current, outlook, visitor }: Hero
 }
 
 export function renderHeroError (el: HTMLElement): void {
+  el.dataset.state = 'error'
   el.setAttribute('aria-busy', 'false')
   el.querySelector('.hero__answer')!.textContent = 'Hmm.'
   el.querySelector('.hero__detail')!.textContent = "Couldn't reach the weather service. Try again in a minute."

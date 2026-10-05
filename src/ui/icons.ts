@@ -15,7 +15,7 @@ function sun (cx: number, cy: number, r: number, rays: [number, number]): string
 }
 
 const moon = (scale = 1, dx = 0, dy = 0): string =>
-  `<path transform="translate(${dx} ${dy}) scale(${scale})" d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>`
+  `<path class="i-moon" transform="translate(${dx} ${dy}) scale(${scale})" d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>`
 
 function behindCloud (content: string): string {
   const id = `ic${uid++}`

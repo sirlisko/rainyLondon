@@ -2,7 +2,7 @@ import type { Kind } from '../weather'
 import { icon } from './icons'
 
 // Same tile as public/favicon.svg, so the icon only changes what's drawn on it.
-const TILE = '<style>.tile{fill:#f4f1ea}svg{color:#2c55c9}@media (prefers-color-scheme:dark){.tile{fill:#15181e}svg{color:#86a8ff}}</style><rect class="tile" width="32" height="32" rx="8"/>'
+const TILE = '<style>.tile{fill:#e8ebee}svg{color:#2c55c9}@media (prefers-color-scheme:dark){.tile{fill:#15181e}svg{color:#86a8ff}}</style><rect class="tile" width="32" height="32" rx="8"/>'
 
 export function paintTab (raining: boolean, kind: Kind, isDay: boolean): void {
   document.title = `${raining ? 'Yes.' : 'No.'} · Is It Raining in London?`

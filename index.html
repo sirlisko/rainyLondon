@@ -19,7 +19,7 @@
   <meta property="og:image:alt"
     content="Is it raining in London? Probably not. London averages 671 mm of rain a year, less than Sydney, Rome and New York.">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#e8ebee" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0e1014" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -28,31 +28,30 @@
 <body>
   <section class="hero" data-state="loading" aria-busy="true">
     <div class="hero__rain" aria-hidden="true"></div>
-    <div class="hero__inner">
-      <p class="hero__announce visually-hidden" aria-live="polite"></p>
-      <a class="hero__brand" href="/">Rainy London?</a>
-      <div class="toggle toggle--units" role="group" aria-label="Units">
-        <button type="button" data-units="metric" aria-pressed="true">°C, mm</button>
-        <button type="button" data-units="imperial" aria-pressed="false">°F, in</button>
-      </div>
-      <h1 class="hero__question">Is it raining in London right now?</h1>
-      <div class="hero__row">
-        <p class="hero__answer">…</p>
-        <div class="hero__icon"></div>
-      </div>
-      <p class="hero__detail">Checking the sky over Westminster…</p>
-      <p class="hero__outlook"></p>
-      <div class="hero__ahead"></div>
-      <p class="hero__quip"></p>
-      <p class="hero__visitor"></p>
-      <button class="hero__share" type="button" hidden>Share</button>
+    <p class="hero__announce visually-hidden" aria-live="polite"></p>
+    <a class="hero__brand" href="/">Rainy London?</a>
+    <div class="toggle toggle--units" role="group" aria-label="Units">
+      <button type="button" data-units="metric" aria-pressed="true">°C, mm</button>
+      <button type="button" data-units="imperial" aria-pressed="false">°F, in</button>
     </div>
-    <a class="hero__cue" href="#evidence">The evidence <span aria-hidden="true">↓</span></a>
+    <h1 class="hero__question">Is it raining in London right now?</h1>
+    <div class="hero__main">
+      <p class="hero__answer">…</p>
+      <div class="hero__info">
+        <p class="hero__detail">Checking the sky over Westminster…</p>
+        <p class="hero__outlook"></p>
+        <div class="hero__ahead"></div>
+        <p class="hero__visitor"></p>
+        <p class="hero__quip"></p>
+        <div class="hero__actions">
+          <button class="hero__share" type="button" hidden>Share</button>
+          <a class="hero__cue" href="#evidence">The evidence <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+    </div>
   </section>
 
   <main id="evidence">
-    <section class="punchline"></section>
-
     <section class="climate"></section>
 
     <section class="league">
@@ -75,7 +74,10 @@
           </div>
         </div>
       </header>
-      <div class="grid"></div>
+      <div class="rows__head" aria-hidden="true">
+        <span></span><span></span><span>Now</span><span>Rain, last 12 months</span><span>Dry days</span><span>Last 30 days</span><span></span>
+      </div>
+      <ol class="rows"></ol>
     </section>
   </main>
 
@@ -94,7 +96,7 @@
       <p>A dry day is one with less than 1 mm of rain, the flip side of the usual meteorological definition of a rain
         day.</p>
     </details>
-    <p class="footer__line">Real data, no myths. The cards cover <span class="footer__period nowrap"></span>, the yearly averages <span
+    <p class="footer__line">Real data, no myths. The league covers <span class="footer__period nowrap"></span>, the yearly averages <span
         class="nowrap" data-climate-period></span>. Current conditions refresh every 15 minutes.</p>
     <p class="footer__line"><a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a> (CC BY 4.0) · Made by <a
         href="https://sirlisko.com">sirlisko</a>, who grew up on Lake&nbsp;Maggiore.</p>
