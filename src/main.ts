@@ -32,6 +32,7 @@ let londonNow: Current | undefined
 let londonOutlook: Outlook | undefined
 let visitor: { city: City, current?: Current } | undefined
 let lastRefresh = Date.now()
+let historyEnd = ''
 let lastSummary = ''
 const shown = new Set<string>()
 
@@ -147,8 +148,22 @@ function renderAll (): void {
   render()
 }
 
+// Returns whether the 12-month window moved, which happens once a day.
+function syncPeriod (): boolean {
+  const range = historyRange()
+  if (range.end === historyEnd) return false
+  historyEnd = range.end
+  document.querySelector('.footer__period')!.textContent = `${shortDate(range.start)} to ${shortDate(range.end)}`
+  return true
+}
+
 async function refreshNow (): Promise<void> {
   lastRefresh = Date.now()
+  // A tab left open past midnight UTC would otherwise keep showing yesterday's league.
+  if (syncPeriod()) {
+    await Promise.all([loadHero(), loadVisitorNow(), ...entries.map(load)])
+    return
+  }
   await Promise.all([loadHero(), loadVisitorNow()])
   await Promise.all(entries.map(async e => {
     try { e.current = await fetchCurrent(e.city) } catch {}
@@ -249,6 +264,7 @@ const initial: Array<[City, Role]> = [
   ...pickRandom(POOL, RANDOM_COUNT).map((c): [City, Role] => [c, 'random'])
 ]
 for (const [city, role] of initial) addEntry(city, role)
+syncPeriod()
 renderClimate(climate)
 renderClimateRefs(document)
 render()
@@ -295,6 +311,3 @@ setInterval(() => { if (!document.hidden) tickClocks(document) }, 60_000)
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && Date.now() - lastRefresh > REFRESH_MS) void refreshNow()
 })
-
-const range = historyRange()
-document.querySelector('.footer__period')!.textContent = `${shortDate(range.start)} to ${shortDate(range.end)}`
