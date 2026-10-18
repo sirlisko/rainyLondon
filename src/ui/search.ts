@@ -1,3 +1,4 @@
+import { track } from '../analytics'
 import { searchCity, type SearchResult } from '../api'
 import { esc } from './format'
 
@@ -35,6 +36,7 @@ export function mountSearch (root: HTMLElement, onPick: (city: SearchResult) => 
     clearTimeout(timer)
     inflight?.abort()
     onPick(r)
+    track('add-city', { city: r.name, country: r.country })
     input.value = ''
     results = []
     status.textContent = `${r.name} added`
