@@ -248,9 +248,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .icon--cloud .i-cloud { animation: drift 6s ease-in-out infinite alternate; }
 
 /* At hero size every sky gets one slow, small movement; the league's small icons keep only the ones above. */
-.hero__dot .i-cloud { animation: drift 6s ease-in-out infinite alternate; }
+/* The cut-out drifts with its cloud, or the gap around a peeking sun or moon breathes. */
+.hero__dot :is(.i-cloud, .i-cut) { animation: drift 6s ease-in-out infinite alternate; }
 .hero__dot .i-fog { animation: drift 4s ease-in-out infinite alternate-reverse; }
-.hero__dot .i-moon { transform-box: fill-box; transform-origin: center; animation: rock 9s ease-in-out infinite alternate; }
+.hero__dot .icon--clear .i-moon { transform-box: fill-box; transform-origin: center; animation: rock 9s ease-in-out infinite alternate; }
 .hero__dot .i-bolt { animation: flicker 5s linear infinite; }
 
 @keyframes rain { to { background-position: -40px 140px, -60px 220px; } }

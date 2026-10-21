@@ -14,13 +14,15 @@ function sun (cx: number, cy: number, r: number, rays: [number, number]): string
   return `<circle cx="${cx}" cy="${cy}" r="${r}"/><g class="i-rays" style="transform-origin:${cx}px ${cy}px">${spokes}</g>`
 }
 
+// Placed by a wrapper because the hero's rock animation sets transform-origin on
+// .i-moon, which would otherwise re-anchor this scale around the moon's centre.
 const moon = (scale = 1, dx = 0, dy = 0): string =>
-  `<path class="i-moon" transform="translate(${dx} ${dy}) scale(${scale})" d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/>`
+  `<g transform="translate(${dx} ${dy}) scale(${scale})"><path class="i-moon" d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></g>`
 
 function behindCloud (content: string): string {
   const id = `ic${uid++}`
   return `<mask id="${id}" maskUnits="userSpaceOnUse" x="-2" y="-2" width="28" height="28"><rect x="-2" y="-2" width="28" height="28" fill="#fff"/>
-    <path transform="${PARTLY}" d="${CLOUD}" fill="#000" stroke="#000" stroke-width="4.5"/></mask>
+    <path class="i-cut" transform="${PARTLY}" d="${CLOUD}" fill="#000" stroke="#000" stroke-width="4.5"/></mask>
     <g mask="url(#${id})">${content}</g><path class="i-cloud" transform="${PARTLY}" d="${CLOUD}"/>`
 }
 
@@ -32,7 +34,7 @@ const falling = (marks: string): string =>
 
 const BODIES: Record<Kind, (day: boolean) => string> = {
   clear: day => day ? sun(12, 12, 4.25, [7, 9.5]) : moon(),
-  partly: day => behindCloud(day ? sun(9, 9, 3.5, [6, 8]) : moon(0.72, 1.5, 0.5)),
+  partly: day => behindCloud(day ? sun(9, 9, 3.5, [6, 8]) : moon(0.6, 0, -0.5)),
   cloud: () => `<path class="i-cloud" d="${CLOUD}"/>`,
   fog: () => `<path class="i-cloud" transform="${CLOUD_HIGH}" d="${CLOUD}"/>
     <g class="i-fog"><line x1="5" y1="19" x2="19" y2="19"/><line x1="8" y1="22" x2="16" y2="22"/></g>`,
