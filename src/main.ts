@@ -112,6 +112,8 @@ function render (): void {
 function paintHero (): void {
   if (!londonNow) return
   paintTab(isRaining(londonNow), describe(londonNow.weatherCode).kind, londonNow.isDay)
+  // A hidden tab is only seen through its title and favicon; the hero is redrawn on return.
+  if (document.hidden) return
   renderHero(hero, {
     current: londonNow,
     outlook: londonOutlook,
@@ -305,9 +307,11 @@ readAdded().forEach(id => {
     .catch(() => {})
 })
 
-// Hidden tabs skip the poll; visibilitychange catches them up on return.
-setInterval(() => { if (!document.hidden) void refreshNow() }, REFRESH_MS)
+// Hidden tabs still poll London so the tab title stays true; visibilitychange catches up the rest on return.
+setInterval(() => { void (document.hidden ? loadHero() : refreshNow()) }, REFRESH_MS)
 setInterval(() => { if (!document.hidden) tickClocks(document) }, 60_000)
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && Date.now() - lastRefresh > REFRESH_MS) void refreshNow()
+  if (document.hidden) return
+  paintHero()
+  if (Date.now() - lastRefresh > REFRESH_MS) void refreshNow()
 })
